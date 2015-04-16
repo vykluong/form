@@ -190,6 +190,9 @@ $.fn.ajaxSubmit = function(options) {
         var oldSuccess = options.success || function(){};
         callbacks.push(function(data) {
             var fn = options.replaceTarget ? 'replaceWith' : 'html';
+            if (fn == 'html') {
+              data = $.parseHTML(data);
+            }
             $(options.target)[fn](data).each(oldSuccess, arguments);
         });
     }
@@ -800,9 +803,9 @@ $.fn.ajaxSubmit = function(options) {
             }
             return (doc && doc.documentElement && doc.documentElement.nodeName != 'parsererror') ? doc : null;
         };
-        var parseJSON = $.parseJSON || function(s) {
-            /*jslint evil:true */
-            return window['eval']('(' + s + ')');
+        var parseJSON = $.parseJSON || function() {
+            window.console.log("jquery.parseJSON is undefined.");
+            return null;
         };
 
         var httpData = function( xhr, type, s ) { // mostly lifted from jq1.4.4
@@ -822,7 +825,7 @@ $.fn.ajaxSubmit = function(options) {
             if (typeof data === 'string') {
                 if (type === 'json' || !type && ct.indexOf('json') >= 0) {
                     data = parseJSON(data);
-                } else if (type === "script" || !type && ct.indexOf("javascript") >= 0) {
+                } else if (type === "script") {
                     $.globalEval(data);
                 }
             }
